@@ -1,0 +1,24 @@
+import Link from 'next/link'
+import css from './Header.module.css'
+
+export default function Header() {
+  return (
+    <header className={css.header}>
+      <Link href="/" className={css.headerLink}>
+        NoteHub
+      </Link>
+      <ul className={css.navigation}>
+        <li className={css.navigationItem}>
+          <Link href="/notes" className={css.navigationLink}>
+            Notes
+          </Link>
+        </li>
+        <li className={css.navigationItem}>
+          <Link href="/notes/action/create" className={css.navigationLink}>
+            Create
+          </Link>
+        </li>
+      </ul>
+    </header>
+  )
+}
