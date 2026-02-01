@@ -1,7 +1,4 @@
-/* TanStackProvider.module.css */
-
-.provider {
-  display: block;
+/* Тут стилі мінімальні, бо компонент обгортки для QueryClientProvider */
+.wrapper {
   width: 100%;
-  height: 100%;
 }
