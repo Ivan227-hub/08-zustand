@@ -1,32 +1,26 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import NoteForm from "@/components/NoteForm/NoteForm";
+import css from "@/components/NoteForm/NoteForm.module.css";
 
-interface Draft {
-  title: string;
-  content: string;
-  tag: string;
-}
-
-interface NoteStore {
-  draft: Draft;
-  setDraft: (note: Partial<Draft>) => void;
-  clearDraft: () => void;
-}
-
-const initialDraft: Draft = {
-  title: "",
-  content: "",
-  tag: "Todo",
+export const metadata = {
+  title: "Create Note | NoteHub",
+  description: "Page to create a new note",
+  url: "/notes/action/create",
+  openGraph: {
+    title: "Create Note | NoteHub",
+    description: "Page to create a new note",
+    url: "/notes/action/create",
+    images: ["https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"],
+  },
 };
 
-export const useNoteStore = create<NoteStore>()(
-  persist(
-    (set) => ({
-      draft: initialDraft,
-      setDraft: (note) =>
-        set((state) => ({ draft: { ...state.draft, ...note } })),
-      clearDraft: () => set({ draft: initialDraft }),
-    }),
-    { name: "note-draft" }
-  )
-);
+// ✅ Обов'язково має бути дефолтний експорт компонента сторінки
+export default function CreateNote() {
+  return (
+    <main className={css.main}>
+      <div className={css.container}>
+        <h1 className={css.title}>Create note</h1>
+        <NoteForm />
+      </div>
+    </main>
+  );
+}
