@@ -13,13 +13,13 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "baseUrl": ".",
+    "baseUrl": ".",                // Базова директорія для всіх шляхів
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"]              // Аліас @/ → корінь проєкту
     },
     "plugins": [
       {
-        "name": "next"
+        "name": "next"             // Next.js плагін для TS
       }
     ]
   },
@@ -31,5 +31,7 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "compileOnSave": false,         // Не компілювати автоматично при збереженні
+  "forceConsistentCasingInFileNames": true // Вимагає правильний регістр у шляхах
 }
