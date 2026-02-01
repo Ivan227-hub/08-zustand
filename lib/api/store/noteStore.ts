@@ -5,7 +5,7 @@ import { NoteDraft } from '@/types/note'
 const initialDraft: NoteDraft = {
   title: '',
   content: '',
-  tag: 'Todo'
+  tag: 'Todo',
 }
 
 interface NoteStore {
@@ -16,11 +16,13 @@ interface NoteStore {
 
 export const useNoteStore = create<NoteStore>()(
   persist(
-    set => ({
+    (set) => ({
       draft: initialDraft,
-      setDraft: note => set({ draft: note }),
-      clearDraft: () => set({ draft: initialDraft })
+      setDraft: (note) => set({ draft: note }),
+      clearDraft: () => set({ draft: initialDraft }),
     }),
-    { name: 'note-draft' }
+    {
+      name: 'note-draft',
+    }
   )
 )
