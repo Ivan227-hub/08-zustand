@@ -5,7 +5,6 @@ export default function NotesPage() {
     <main className={css.main}>
       <div className={css.container}>
         <h1 className={css.title}>All Notes</h1>
-        {}
       </div>
     </main>
   )
