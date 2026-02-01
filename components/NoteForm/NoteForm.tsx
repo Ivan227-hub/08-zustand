@@ -1,49 +1,43 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useNoteStore } from '@/lib/store/noteStore'
-import css from './NoteForm.module.css'
-import { NoteDraft } from '@/types/note'
-import { createNote } from '@/lib/api/notes'
-import { useRouter } from 'next/navigation'
+import { useNoteStore } from "@/lib/store/noteStore";
+import { FormEvent, useEffect, useState } from "react";
+import css from "./NoteForm.module.css";
 
 export default function NoteForm() {
-  const router = useRouter()
-  const { draft, setDraft, clearDraft } = useNoteStore()
-  const [form, setForm] = useState<NoteDraft>(draft)
+  const { draft, setDraft, clearDraft } = useNoteStore();
+  const [title, setTitle] = useState(draft.title);
+  const [content, setContent] = useState(draft.content);
+  const [tag, setTag] = useState(draft.tag);
 
   useEffect(() => {
-    setForm(draft)
-  }, [draft])
+    setDraft({ title, content, tag });
+  }, [title, content, tag, setDraft]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
-    setDraft({ ...form, [name]: value })
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    await createNote(form)
-    clearDraft()
-    router.back()
-  }
-
-  const handleCancel = () => router.back()
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    console.log("Note created:", { title, content, tag });
+    clearDraft();
+  };
 
   return (
     <form className={css.form} onSubmit={handleSubmit}>
-      <input name="title" value={form.title} onChange={handleChange} placeholder="Title" className={css.input} />
-      <textarea name="content" value={form.content} onChange={handleChange} placeholder="Content" className={css.textarea} />
-      <select name="tag" value={form.tag} onChange={handleChange} className={css.select}>
+      <input
+        type="text"
+        value={title}
+        placeholder="Title"
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <textarea
+        value={content}
+        placeholder="Content"
+        onChange={(e) => setContent(e.target.value)}
+      />
+      <select value={tag} onChange={(e) => setTag(e.target.value)}>
         <option value="Todo">Todo</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Done">Done</option>
+        <option value="Important">Important</option>
       </select>
-      <div className={css.actions}>
-        <button type="submit">Save</button>
-        <button type="button" onClick={handleCancel}>Cancel</button>
-      </div>
+      <button type="submit">Save</button>
     </form>
-  )
+  );
 }
