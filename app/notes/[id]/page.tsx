@@ -1,8 +1,13 @@
+import type { Metadata } from 'next'
 import { api } from '@/lib/api/axios'
 import { Note } from '@/types/note'
 import css from '@/components/NoteDetails/NoteDetails.module.css'
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string }
+}): Promise<Metadata> {
   const { data } = await api.get<Note>(`/notes/${params.id}`)
 
   return {
@@ -12,12 +17,20 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
       title: data.title,
       description: data.content.slice(0, 100),
       url: `https://your-app.vercel.app/notes/${params.id}`,
-      images: ['https://ac.goit.global/fullstack/react/notehub-og-meta.jpg']
-    }
+      images: [
+        {
+          url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
+        },
+      ],
+    },
   }
 }
 
-export default async function NotePage({ params }: { params: { id: string } }) {
+export default async function NotePage({
+  params,
+}: {
+  params: { id: string }
+}) {
   const { data: note } = await api.get<Note>(`/notes/${params.id}`)
 
   return (
