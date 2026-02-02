@@ -1,11 +1,15 @@
 import type { Metadata } from 'next'
-import { useParams } from 'next/navigation'
+import Notes from './Notes.client'
+
+interface PageProps {
+  params: {
+    slug?: string[]
+  }
+}
 
 export async function generateMetadata({
   params,
-}: {
-  params: { slug?: string[] }
-}): Promise<Metadata> {
+}: PageProps): Promise<Metadata> {
   const slug = params.slug?.join('/') ?? 'all'
 
   return {
@@ -14,15 +18,8 @@ export async function generateMetadata({
   }
 }
 
-export default function FilterNotesPage() {
-  const params = useParams()
-  const slug = params.slug
-  const slugStr = Array.isArray(slug) ? slug.join('/') : slug
+export default function FilterNotesPage({ params }: PageProps) {
+  const tag = params.slug?.[0] ?? 'all'
 
-  return (
-    <div>
-      <h1>Filter Notes</h1>
-      <p>Slug: {slugStr}</p>
-    </div>
-  )
+  return <Notes tag={tag} />
 }
