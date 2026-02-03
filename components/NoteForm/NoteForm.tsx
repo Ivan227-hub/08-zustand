@@ -1,23 +1,43 @@
 "use client";
 
+import { FormEvent, ChangeEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { createNote } from "@/lib/api";
 import { useNoteStore } from "@/lib/store/noteStore";
-import { FormEvent, useEffect, useState } from "react";
 import css from "./NoteForm.module.css";
 
 export default function NoteForm() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
   const { draft, setDraft, clearDraft } = useNoteStore();
-  const [title, setTitle] = useState(draft.title);
-  const [content, setContent] = useState(draft.content);
-  const [tag, setTag] = useState(draft.tag);
+
+  const [title, setTitle] = useState<string>(draft.title);
+  const [content, setContent] = useState<string>(draft.content);
+  const [tag, setTag] = useState<string>(draft.tag);
 
   useEffect(() => {
     setDraft({ title, content, tag });
   }, [title, content, tag, setDraft]);
 
-  const handleSubmit = (e: FormEvent) => {
+  const { mutate, isPending } = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      clearDraft();
+      router.back();
+    },
+  });
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Note created:", { title, content, tag });
-    clearDraft();
+    mutate({ title, content, tag });
+  };
+
+  const handleCancel = () => {
+    router.back();
   };
 
   return (
@@ -26,18 +46,43 @@ export default function NoteForm() {
         type="text"
         value={title}
         placeholder="Title"
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          setTitle(e.target.value)
+        }
+        required
       />
+
       <textarea
         value={content}
         placeholder="Content"
-        onChange={(e) => setContent(e.target.value)}
+        onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+          setContent(e.target.value)
+        }
+        required
       />
-      <select value={tag} onChange={(e) => setTag(e.target.value)}>
-        <option value="Todo">Todo</option>
-        <option value="Important">Important</option>
+
+      <select
+        value={tag}
+        onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+          setTag(e.target.value)
+        }
+        required
+      >
+        <option value="">Select tag</option>
+        <option value="Work">Work</option>
+        <option value="Personal">Personal</option>
+        <option value="Meeting">Meeting</option>
+        <option value="Shopping">Shopping</option>
       </select>
-      <button type="submit">Save</button>
+
+      <div className={css.actions}>
+        <button type="submit" disabled={isPending}>
+          Create note
+        </button>
+        <button type="button" onClick={handleCancel}>
+          Cancel
+        </button>
+      </div>
     </form>
   );
 }
