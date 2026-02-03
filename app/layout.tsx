@@ -1,10 +1,7 @@
-"use client"; // 🔥 Важно для QueryClientProvider
-
 import './globals.css'
 import { Roboto } from 'next/font/google'
 import type { Metadata } from 'next'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useState } from 'react'
+import QueryProvider from './QueryProvider' // наш клиентский компонент
 
 const roboto = Roboto({
   weight: ['400', '700'],
@@ -28,20 +25,13 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  // Создаём QueryClient один раз
-  const [queryClient] = useState(() => new QueryClient())
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={roboto.variable}>
       <body>
-        <QueryClientProvider client={queryClient}>
+        <QueryProvider>
           {children}
-        </QueryClientProvider>
+        </QueryProvider>
       </body>
     </html>
   )
