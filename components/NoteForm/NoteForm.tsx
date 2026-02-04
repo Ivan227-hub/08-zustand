@@ -71,6 +71,7 @@ export default function NoteForm() {
         <option value="">Select tag</option>
         <option value="Work">Work</option>
         <option value="Personal">Personal</option>
+        <option value="Todo">Todo</option>
         <option value="Meeting">Meeting</option>
         <option value="Shopping">Shopping</option>
       </select>
