@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect, ChangeEvent } from "react";
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { fetchNotes, FetchNotesParams } from "@/lib/api";
-import { Note } from "@/types/note";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+
+import { fetchNotes } from "@/lib/api";
+import { Note } from "@/types/note";
+
+import SearchBox from "@/components/SearchBox/SearchBox";
+import Pagination from "@/components/Pagination/Pagination";
+import NoteList from "@/components/NoteList/NoteList";
+
 import css from "./Notes.module.css";
 
 interface NotesProps {
@@ -16,75 +22,54 @@ export default function Notes({ tag }: NotesProps) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Дебаунс поиска
+  // debounce search
   useEffect(() => {
-    const handler = setTimeout(() => {
+    const timer = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(1);
     }, 500);
-    return () => clearTimeout(handler);
+
+    return () => clearTimeout(timer);
   }, [search]);
 
-  const fetchParams: FetchNotesParams = { tag, search: debouncedSearch, page };
-
-  // ⚡ useQuery без keepPreviousData напрямую
-  const queryOptions: UseQueryOptions<Note[], Error> = {
+  const { data, isLoading, isError } = useQuery<Note[]>({
     queryKey: ["notes", tag, debouncedSearch, page],
-    queryFn: () => fetchNotes(fetchParams),
-    staleTime: 500, // данные считаем свежими на 500ms
-  };
+    queryFn: () =>
+      fetchNotes({
+        tag,
+        search: debouncedSearch,
+        page,
+      }),
+    placeholderData: (prev) => prev,
+  });
 
-  const query = useQuery(queryOptions);
-
-  const notes: Note[] = Array.isArray(query.data) ? query.data : [];
-
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value);
-  const handlePrevPage = () => page > 1 && setPage(prev => prev - 1);
-  const handleNextPage = () => notes.length > 0 && setPage(prev => prev + 1);
+  const notes = data ?? [];
 
   return (
     <section className={css.notesSection}>
       <div className={css.header}>
         <h1>Filter Notes</h1>
+
         <Link href="/notes/action/create" className={css.createButton}>
           Create note +
         </Link>
       </div>
 
-      <div className={css.searchBox}>
-        <input
-          type="text"
-          placeholder="Search notes..."
-          value={search}
-          onChange={handleSearchChange}
-          className={css.searchInput}
-        />
-      </div>
+      <SearchBox value={search} onChange={setSearch} />
 
-      {query.isLoading && <p>Loading notes...</p>}
-      {query.isError && <p>Error loading notes.</p>}
+      {isLoading && <p>Loading notes...</p>}
+      {isError && <p>Error loading notes.</p>}
 
-      {notes.length > 0 ? (
-        <ul className={css.noteList}>
-          {notes.map(note => (
-            <li key={note.id} className={css.noteItem}>
-              <Link href={`/notes/${note.id}`}>
-                <h2>{note.title}</h2>
-                <p>{note.content.slice(0, 100)}...</p>
-                <span className={css.tag}>{note.tag}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No notes found.</p>
+      {!isLoading && !isError && (
+        <>
+          <NoteList notes={notes} />
+
+          <Pagination
+            page={page}
+            total={notes.length}
+          />
+        </>
       )}
-
-      <div className={css.pagination}>
-        <button onClick={handlePrevPage} disabled={page === 1}>Prev</button>
-        <span>Page {page}</span>
-        <button onClick={handleNextPage} disabled={notes.length === 0}>Next</button>
-      </div>
     </section>
   );
 }
