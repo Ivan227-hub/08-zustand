@@ -22,11 +22,10 @@ export default function Notes({ tag }: NotesProps) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // debounce search
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
-      setPage(1);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -55,18 +54,28 @@ export default function Notes({ tag }: NotesProps) {
         </Link>
       </div>
 
-      <SearchBox value={search} onChange={setSearch} />
+      <SearchBox
+        value={search}
+        onChange={(value) => {
+          setSearch(value);
+          setPage(1); 
+        }}
+      />
 
       {isLoading && <p>Loading notes...</p>}
       {isError && <p>Error loading notes.</p>}
 
       {!isLoading && !isError && (
         <>
-          <NoteList notes={notes} />
+          {notes.length > 0 ? (
+            <NoteList notes={notes} />
+          ) : (
+            <p>No notes found.</p>
+          )}
 
           <Pagination
             page={page}
-            total={notes.length}
+            total={1}
           />
         </>
       )}
