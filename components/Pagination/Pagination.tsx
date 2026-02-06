@@ -1,14 +1,35 @@
-import Link from 'next/link'
-import css from './Pagination.module.css'
+interface PaginationProps {
+  page: number;
+  total: number;
+  onPageChange: (page: number) => void;
+}
 
-export default function Pagination({ page, total }: { page: number; total: number }) {
+export default function Pagination({
+  page,
+  total,
+  onPageChange,
+}: PaginationProps) {
+  if (total <= 1) return null;
+
   return (
-    <ul className={css.pagination}>
-      {Array.from({ length: total }).map((_, i) => (
-        <li key={i} className={page === i + 1 ? css.active : ''}>
-          <Link href={`?page=${i + 1}`}>{i + 1}</Link>
-        </li>
-      ))}
-    </ul>
-  )
+    <div>
+      <button
+        disabled={page === 1}
+        onClick={() => onPageChange(page - 1)}
+      >
+        Prev
+      </button>
+
+      <span>
+        {page} / {total}
+      </span>
+
+      <button
+        disabled={page === total}
+        onClick={() => onPageChange(page + 1)}
+      >
+        Next
+      </button>
+    </div>
+  );
 }

@@ -1,30 +1,30 @@
-import axios from "axios";
 import { Note } from "@/types/note";
 
-const api = axios.create({
-  baseURL: "https://notehub-public.goit.study/api",
-});
-
-/* ---------- FETCH NOTES ---------- */
-export interface FetchNotesParams {
+interface FetchNotesParams {
   tag: string;
   search: string;
   page: number;
 }
 
-export const fetchNotes = async (params: FetchNotesParams): Promise<Note[]> => {
-  const { data } = await api.get("/notes", { params });
-  return data;
-};
-
-/* ---------- CREATE NOTE ---------- */
-export interface CreateNotePayload {
-  title: string;
-  content: string;
-  tag: string;
+export interface FetchNotesResponse {
+  notes: Note[];
+  totalPages: number;
 }
 
-export const createNote = async (payload: CreateNotePayload): Promise<Note> => {
-  const { data } = await api.post("/notes", payload);
-  return data;
-};
+export async function fetchNotes(
+  params: FetchNotesParams
+): Promise<FetchNotesResponse> {
+  const query = new URLSearchParams({
+    tag: params.tag,
+    search: params.search,
+    page: String(params.page),
+  });
+
+  const res = await fetch(`/api/notes?${query.toString()}`);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch notes");
+  }
+
+  return res.json();
+}

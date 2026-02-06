@@ -22,7 +22,6 @@ export default function Notes({ tag }: NotesProps) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -31,7 +30,7 @@ export default function Notes({ tag }: NotesProps) {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const { data, isLoading, isError } = useQuery<Note[]>({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["notes", tag, debouncedSearch, page],
     queryFn: () =>
       fetchNotes({
@@ -42,7 +41,8 @@ export default function Notes({ tag }: NotesProps) {
     placeholderData: (prev) => prev,
   });
 
-  const notes = data ?? [];
+  const notes: Note[] = data?.notes ?? [];
+  const totalPages: number = data?.totalPages ?? 1;
 
   return (
     <section className={css.notesSection}>
@@ -56,9 +56,9 @@ export default function Notes({ tag }: NotesProps) {
 
       <SearchBox
         value={search}
-        onChange={(value) => {
+        onChange={(value: string) => {
           setSearch(value);
-          setPage(1); 
+          setPage(1);
         }}
       />
 
@@ -75,7 +75,8 @@ export default function Notes({ tag }: NotesProps) {
 
           <Pagination
             page={page}
-            total={1}
+            total={totalPages}
+            onPageChange={setPage}
           />
         </>
       )}
