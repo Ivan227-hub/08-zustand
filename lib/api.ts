@@ -1,6 +1,6 @@
 import { Note } from "@/types/note";
 
-interface FetchNotesParams {
+export interface FetchNotesParams {
   tag: string;
   search: string;
   page: number;
@@ -11,20 +11,23 @@ export interface FetchNotesResponse {
   totalPages: number;
 }
 
-export async function fetchNotes(
-  params: FetchNotesParams
-): Promise<FetchNotesResponse> {
-  const query = new URLSearchParams({
-    tag: params.tag,
-    search: params.search,
-    page: String(params.page),
+
+export async function fetchNotes({
+  tag,
+  search,
+  page,
+}: FetchNotesParams): Promise<FetchNotesResponse> {
+  const params = new URLSearchParams({
+    tag,
+    search,
+    page: String(page),
   });
 
-  const res = await fetch(`/api/notes?${query.toString()}`);
+  const res = await fetch(`/api/notes?${params.toString()}`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch notes");
   }
 
-  return res.json();
+  return res.json(); 
 }

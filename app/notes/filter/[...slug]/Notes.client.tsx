@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
-import { fetchNotes } from "@/lib/api";
+import { fetchNotes, FetchNotesResponse } from "@/lib/api";
 import { Note } from "@/types/note";
 
 import SearchBox from "@/components/SearchBox/SearchBox";
@@ -23,21 +23,13 @@ export default function Notes({ tag }: NotesProps) {
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500);
-
+    const timer = setTimeout(() => setDebouncedSearch(search), 500);
     return () => clearTimeout(timer);
   }, [search]);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<FetchNotesResponse>({
     queryKey: ["notes", tag, debouncedSearch, page],
-    queryFn: () =>
-      fetchNotes({
-        tag,
-        search: debouncedSearch,
-        page,
-      }),
+    queryFn: () => fetchNotes({ tag, search: debouncedSearch, page }),
     placeholderData: (prev) => prev,
   });
 
@@ -48,7 +40,6 @@ export default function Notes({ tag }: NotesProps) {
     <section className={css.notesSection}>
       <div className={css.header}>
         <h1>Filter Notes</h1>
-
         <Link href="/notes/action/create" className={css.createButton}>
           Create note +
         </Link>
@@ -67,17 +58,9 @@ export default function Notes({ tag }: NotesProps) {
 
       {!isLoading && !isError && (
         <>
-          {notes.length > 0 ? (
-            <NoteList notes={notes} />
-          ) : (
-            <p>No notes found.</p>
-          )}
+          {notes.length > 0 ? <NoteList notes={notes} /> : <p>No notes found.</p>}
 
-          <Pagination
-            page={page}
-            total={totalPages}
-            onPageChange={setPage}
-          />
+          <Pagination page={page} total={totalPages} onPageChange={setPage} />
         </>
       )}
     </section>
