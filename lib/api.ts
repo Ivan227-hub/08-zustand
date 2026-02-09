@@ -8,6 +8,10 @@ export interface CreateNoteParams {
 }
 
 
+
+
+
+
 export async function createNote(params: CreateNoteParams): Promise<Note> {
   const res = await fetch("/api/notes", {
     method: "POST",
